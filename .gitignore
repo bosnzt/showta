@@ -1,0 +1,8 @@
+mnt/
+runtime/
+*.db
+**/dist/*
+!**/dist/index.html
+*.pem
+config.ini
+*.exe
