@@ -5,6 +5,7 @@ type FolderSetting struct {
 	Folder   string `json:"folder" gorm:"unique"`
 	Write    bool   `json:"write"`
 	Password string `json:"password"`
+	ApplySub bool   `json:"apply_sub"`
 	Topmd    string `json:"topmd"`
 	Readme   string `json:"readme"`
 }

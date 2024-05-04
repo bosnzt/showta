@@ -161,6 +161,7 @@ type UpdateDisplayReq struct {
 	Picture []string `json:"picture"`
 	Text    []string `json:"text"`
 	Audio   []string `json:"audio"`
+	Office  string   `json:"office"`
 }
 
 type GetSiteResp struct {

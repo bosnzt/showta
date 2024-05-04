@@ -12,5 +12,8 @@ const (
 	Audio
 	Picture
 	Text
+	LocalDocx
+	LocalXlsx
+	OfficeMS
 	Other
 )

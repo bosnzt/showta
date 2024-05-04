@@ -18,7 +18,7 @@ func GenToken(username string, pwdStamp int64) (tokenString string, err error) {
 		Username: username,
 		PwdStamp: pwdStamp,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour * time.Duration(1))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(conf.AppConf.Secure.TokenExpire))),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		}}

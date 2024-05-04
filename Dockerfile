@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine as prestage
 
 #Use the repository of Chinese Mainland
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \  
@@ -8,10 +8,14 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 # Set GOPROXY environment variable
 ENV GOPROXY=https://goproxy.cn,direct
 
-WORKDIR /svc/
+WORKDIR /src/
 COPY . .
 RUN go mod download && \  
-    bash make.sh 
+    bash make.sh public
+
+FROM alpine
+WORKDIR /svc/
+COPY --from=prestage /src/showta ./
 
 VOLUME /svc/runtime/
 EXPOSE 8888

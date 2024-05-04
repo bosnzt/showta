@@ -36,8 +36,9 @@ type Database struct {
 }
 
 type Secure struct {
-	JwtSecret string `ini:"jwt_secret"`
-	SignKey   string `ini:"sign_key"`
+	TokenExpire int    `ini:"token_expire"`
+	JwtSecret   string `ini:"jwt_secret"`
+	SignKey     string `ini:"sign_key"`
 }
 
 type Config struct {
@@ -104,8 +105,9 @@ func genLocalConf() {
 	}
 
 	AppConf.Secure = Secure{
-		JwtSecret: util.GenRandStr(16),
-		SignKey:   util.GenRandStr(16),
+		TokenExpire: 72,
+		JwtSecret:   util.GenRandStr(16),
+		SignKey:     util.GenRandStr(16),
 	}
 
 	createIniFile()

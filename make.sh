@@ -15,5 +15,7 @@ makeDocker() {
     go build -o showta -ldflags="$ldflags" .
 }
 
-pullWeb
+if [ "$1" = "public" ]; then
+    pullWeb
+fi
 makeDocker

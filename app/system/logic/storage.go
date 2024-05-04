@@ -12,6 +12,7 @@ import (
 	"showta.cc/app/system/log"
 	"showta.cc/app/system/model"
 	"sync"
+	"time"
 )
 
 const (
@@ -116,6 +117,7 @@ func MountStorage(ctx context.Context, data model.Storage) error {
 		return err
 	}
 
+	data.UpdatedAt = time.Now()
 	data.SetStatus(WORK)
 
 	inst := engine()
@@ -268,8 +270,10 @@ func LoadStorage(ctx context.Context, data model.Storage) error {
 
 func SyncUpdateStorage(inst storage.Storage, token string) {
 	data := inst.GetData()
-	if data.ID > 0 && data.Token != token {
+	if data.Token != token {
 		data.Token = token
-		model.UpdateStorage(data)
+		if data.ID > 0 {
+			model.UpdateStorage(data)
+		}
 	}
 }

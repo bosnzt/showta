@@ -36,6 +36,7 @@ const (
 	PreviewPictureKey = "preview_picture"
 	PreviewTextKey    = "preview_text"
 	PreviewAudioKey   = "preview_audio"
+	PreviewOfficeKey  = "preview_office"
 	TremSite          = 1
 	TremDisplay       = 2
 )
@@ -71,10 +72,12 @@ func checkDefaultPreference() {
 				previewText = strings.Split(v.Value, ",")
 			} else if v.Key == PreviewAudioKey {
 				previewAudio = strings.Split(v.Value, ",")
+			} else if v.Key == PreviewOfficeKey {
+				conf.PreviewOffice = v.Value
 			}
 		}
 
-		loadPreviewConf()
+		loadPreviewConf(false)
 	} else {
 		var addList = []*model.Preference{
 			{
@@ -132,6 +135,11 @@ func checkDefaultPreference() {
 				Value: toString(conf.PreviewAudio),
 				Term:  TremDisplay,
 			},
+			{
+				Key:   PreviewOfficeKey,
+				Value: conf.DocLocal,
+				Term:  TremDisplay,
+			},
 		}
 		err = model.BatchCreatePreference(addList)
 		if err != nil {
@@ -143,11 +151,18 @@ func checkDefaultPreference() {
 		previewPicture = conf.PreviewPicture
 		previewText = conf.PreviewText
 		previewAudio = conf.PreviewAudio
-		loadPreviewConf()
+		loadPreviewConf(false)
 	}
 }
 
-func loadPreviewConf() {
+func loadPreviewConf(isUpdate bool) {
+	if isUpdate {
+		ptypeMap.Range(func(key, value interface{}) bool {
+			ptypeMap.Delete(key)
+			return true
+		})
+	}
+
 	for _, v := range previewVideo {
 		ptypeMap.Store(v, conf.Video)
 	}
@@ -238,11 +253,20 @@ func UpdateDisplay(ctx context.Context, data msg.UpdateDisplayReq) (err error) {
 		return
 	}
 
+	if data.Office == conf.DocLocal || data.Office == conf.DocMS {
+		err = model.UpdatePreference(PreviewOfficeKey, data.Office)
+		if err != nil {
+			return
+		}
+
+		conf.PreviewOffice = data.Office
+	}
+
 	previewVideo = video
 	previewPicture = picture
 	previewText = text
 	previewAudio = audio
-	loadPreviewConf()
+	loadPreviewConf(true)
 
 	return
 }
@@ -321,6 +345,18 @@ func getPreviewType(name string) int {
 	}
 
 	ext = strings.ToLower(ext)
+	if conf.PreviewOffice == conf.DocMS {
+		if _, ok := conf.OfficeMSMap[ext]; ok {
+			return conf.OfficeMS
+		}
+	}
+
+	if ext == "docx" {
+		return conf.LocalDocx
+	} else if ext == "xlsx" {
+		return conf.LocalXlsx
+	}
+
 	if ptype, ok := ptypeMap.Load(ext); ok {
 		return ptype.(int)
 	}
